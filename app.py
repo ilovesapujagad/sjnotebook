@@ -1,8 +1,10 @@
 import json
 import os
 import requests
+import paramiko
+from paramiko import SSHClient
 from sys import stderr
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,make_response
 
 app = Flask(__name__)
 
@@ -16,130 +18,153 @@ api_base_url = "https://api.stagingv3.microgen.id/query/api/v1/" + api_key
 def hello_geek():
     return '<h1>Hello from Flask</h2>'
 
-@app.get("/products")
-def getProducts():
+@app.post("/api/login")
+def login():
+    
+    hostname = '10.207.26.22'
+    port = 9995
+    username = "apps"
+    password = "apps247"
+    userz = request.form.get('username')
+    passz= request.form.get('password')
+    usernamez= userz
+    passwordz= passz
+    
+    command = "curl -i --data 'userName=%s&password=%s' -X POST http://10.207.26.22:9995/api/login" % (usernamez , passwordz)
+    
+    client = SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(hostname, username=username, password=password)
+
+#     command = "curl -i --data 'userName=admin&password=admin' -X POST http://10.207.26.22:9995/api/login"
+    stdin, stdout, stderr = client.exec_command(command)
+    # for line in stdout.readlines():
+    #     print (line)
+    z=stdout.read()
+    # print(z)
+    x = str(z)
+    nu = x.find('Content-Type: application/json')
+    g = int(nu)-162
+    u = int(g)+47
+    s = x[g:u]
+    my_dict = {}
+    my_dict['Set-Cookie']= s
+    xs = make_response(my_dict)
+    xs.headers["Set-Cookie"] = s
+    client.close()
+    return xs
+
+@app.get("/api/list")
+def cpu():
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook'
+    cookies = {"JSESSIONID": source}
+    r = requests.get(url, cookies=cookies)
     try:
-        url = "/".join([api_base_url, "products"])
-        response = requests.get(url)
-        respBody = response.json()
+        if r.status_code == 200:
+            return r.json()
+        else:
+            return r.status_code(),401
+    except Exception:
+        return r.json(),401
 
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
+@app.get("/api/notebook/<noteId>")
+def cpus(noteId):
+    sidnode = str(noteId)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/%s' % (sidnode)
+    userz = request.form.get('username')
+    cookies = {"JSESSIONID": source}
+    r = requests.get(url, cookies=cookies)
+    return r.json()
 
-                return respJson
+@app.post("/api/createnote")
+def newnote():
+    request_data = request.get_json()
+    name = request_data['name']
+    sudah = str(name)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook'
+    cookies = {"JSESSIONID": source}
+    r = requests.post(url, cookies=cookies, json={"name": sudah})
+    return r.json()
 
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
+@app.route("/api/notebook/<id>", methods=["DELETE"])
+def deletenote(id):
+    sudah = str(id)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/%s' % (sudah)
+    cookies = {"JSESSIONID": source}
+    r = requests.delete(url, cookies=cookies)
+    return r.json()
 
-            return respJson
+@app.post("/api/notebook/<noteid>/paragraph")
+def newparagraph(noteid):
+    request_data = request.get_json()
+    title = request_data['title']
+    text = request_data['text']
+    snoteid = str(noteid)
+    sudah = str(title)
+    sudah2 = str(text)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/'+snoteid+'/paragraph'
+    cookies = {"JSESSIONID": source}
+    r = requests.post(url, cookies=cookies, json={"title": sudah,"text":sudah2 })
+    return r.json()
 
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
+@app.post("/api/notebook/run/<noteid>/<paragraphid>")
+def runparagraph(noteid,paragraphid):
+    snoteid = str(noteid)
+    sparagraphId = str(paragraphid)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/run/'+snoteid+'/'+sparagraphId+''
+    cookies = {"JSESSIONID": source}
+    r = requests.post(url, cookies=cookies)
+    return r.json()
 
-@app.post("/products")
-def createProduct():
-    try:
-        url = "/".join([api_base_url, "products"])
-        response = requests.post(url, json.dumps(request.json, indent=2))
-        respBody = response.json()
+@app.put("/api/notebook/<noteid>/rename")
+def renameparagraph(noteid):
+    request_data = request.get_json()
+    name = request_data['name']
+    sudah = str(name)
+    snoteid = str(noteid)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook'+snoteid+'/rename'
+    cookies = {"JSESSIONID": source}
+    r = requests.put(url, cookies=cookies, json={"name": sudah})
+    return r.json()
 
-        if response.status_code != 201:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
+@app.route("/api/notebook/<noteid>/paragraph/<paragraphid>", methods=["DELETE"])
+def deleteparagraph(noteid,paragraphid):
+    snoteid = str(noteid)
+    sparagraphId = str(paragraphid)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    cookies = {"JSESSIONID": source}
+    r = requests.delete(url, cookies=cookies)
+    return r.json()
 
-                return respJson
+@app.post("/api/notebook/job/<noteid>")
+def runallparagraph(noteid):
+    snoteid = str(noteid)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/job/'+snoteid+''
+    cookies = {"JSESSIONID": source}
+    r = requests.post(url, cookies=cookies)
+    return r.json()
 
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-        
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.get("/products/<id>")
-def getProductById(id):
-    try:
-        url = "/".join([api_base_url, "products", id])
-        response = requests.get(url)
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.patch("/products/<id>")
-def updateProduct(id):
-    try:
-        url = "/".join([api_base_url, "products", id])
-        response = requests.patch(url, json.dumps(request.json, indent=2))
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-        
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
-
-@app.delete("/products/<id>")
-def deleteProduct(id):
-    try:
-        url = "/".join([api_base_url, "products", id])
-        response = requests.delete(url)
-        respBody = response.json()
-
-        if response.status_code != 200:
-            if respBody.get('message') == 'project not found':
-                respJson = jsonify(
-                    {"message": "failed to connect to your project, please check if the api had been set properly."}, 
-                )
-                respJson.status_code = response.status_code
-
-                return respJson
-
-            respJson = jsonify(respBody)
-            respJson.status_code = response.status_code
-
-            return respJson
-
-        return jsonify(respBody)
-    except Exception as e:
-        return jsonify({"message": "error occured: " + e.__str__()})
+@app.route("/api/notebook/<noteid>/paragraph/<paragraphid>", methods=["PUT"])
+def updateparagraph(noteid,paragraphid):
+    request_data = request.get_json()
+    text = request_data['text']
+    stext = str(text)
+    snoteid = str(noteid)
+    sparagraphId = str(paragraphid)
+    source = str(request.args.get('JSESSIONID'))
+    url = 'http://10.207.26.22:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    cookies = {"JSESSIONID": source}
+    r = requests.put(url, cookies=cookies, json={"text": stext})
+    return r.json()
 
 if __name__ == "__main__":
     app.run(debug=True)
