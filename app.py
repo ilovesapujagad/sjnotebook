@@ -166,21 +166,6 @@ def updateparagraph(noteid,paragraphid):
     r = requests.put(url, cookies=cookies, json={"text": stext})
     return r.json()
 
-@app.get("/api/exportnote/<noteid>")
-def exportnote(noteid):
-    source = str(request.args.get('JSESSIONID'))
-    snoteid = str(noteid)
-    url = 'http://10.10.65.3:9995/api/notebook/export/'+snoteid+''
-    cookies = {"JSESSIONID": source}
-    r = requests.get(url, cookies=cookies)
-    x = r.json()
-    allMovieData = json.loads(str(x["body"]).replace('\n', ''))
-    my_dict = {}
-    my_dict['Set-Cookie']= allMovieData
-    return Response(json.dumps(allMovieData), 
-        mimetype='application/json',
-        headers={'Content-Disposition':'attachment;filename=zones.json'})
-
 @app.get("/api/export/<noteid>")
 def exportnote(noteid):
     source = str(request.args.get('JSESSIONID'))
