@@ -166,5 +166,20 @@ def updateparagraph(noteid,paragraphid):
     r = requests.put(url, cookies=cookies, json={"text": stext})
     return r.json()
 
+@app.get("/api/importnote/<noteid>")
+def importnote(noteid):
+    source = str(request.args.get('JSESSIONID'))
+    snoteid = str(noteid)
+    url = 'http://10.10.65.3:9995/api/notebook/export/'+snoteid+''
+    cookies = {"JSESSIONID": source}
+    r = requests.get(url, cookies=cookies)
+    try:
+        if r.status_code == 200:
+            return r.json()
+        else:
+            return r.status_code(),401
+    except Exception:
+        return r.json(),401
+
 if __name__ == "__main__":
     app.run(debug=True)
