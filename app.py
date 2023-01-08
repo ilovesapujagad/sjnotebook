@@ -166,7 +166,7 @@ def updateparagraph(noteid,paragraphid):
     r = requests.put(url, cookies=cookies, json={"text": stext})
     return r.json()
 
-@app.get("/api/export/<noteid>")
+@app.get("/api/exportnote/<noteid>")
 def exportnote(noteid):
     source = str(request.args.get('JSESSIONID'))
     snoteid = str(noteid)
