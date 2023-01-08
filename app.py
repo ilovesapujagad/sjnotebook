@@ -175,7 +175,8 @@ def importnote(noteid):
     r = requests.get(url, cookies=cookies)
     try:
         if r.status_code == 200:
-            return r.json()
+#             return r.json()
+            return Response(json.dumps(r.json()), status=200, mimetype='application/json')
         else:
             return r.status_code(),401
     except Exception:
