@@ -180,7 +180,7 @@ def importnote(noteid):
         else:
             return r.status_code(),401
     except Exception:
-        return r.json(),401
+        return Response(json.dumps(r.json()), status=200, mimetype='application/json')
 
 if __name__ == "__main__":
     app.run(debug=True)
