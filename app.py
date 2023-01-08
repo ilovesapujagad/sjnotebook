@@ -181,7 +181,7 @@ def exportnote(noteid):
         mimetype='application/json',
         headers={'Content-Disposition':'attachment;filename=zones.json'})
 
-@app.get("/api/importnote")
+@app.post("/api/importnote")
 def importnote():
     source = str(request.args.get('JSESSIONID'))
     filess = request.files['file']
