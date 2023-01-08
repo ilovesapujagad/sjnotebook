@@ -4,7 +4,7 @@ import requests
 import paramiko
 from paramiko import SSHClient
 from sys import stderr
-from flask import Flask, request, jsonify,make_response
+from flask import Flask, request, jsonify,make_response,Response
 
 app = Flask(__name__)
 
@@ -166,21 +166,31 @@ def updateparagraph(noteid,paragraphid):
     r = requests.put(url, cookies=cookies, json={"text": stext})
     return r.json()
 
-@app.get("/api/importnote/<noteid>")
-def importnote(noteid):
+@app.get("/api/export/<noteid>")
+def exportnote(noteid):
     source = str(request.args.get('JSESSIONID'))
     snoteid = str(noteid)
     url = 'http://10.10.65.3:9995/api/notebook/export/'+snoteid+''
     cookies = {"JSESSIONID": source}
     r = requests.get(url, cookies=cookies)
-    try:
-        if r.status_code == 200:
-#             return r.json()
-            return Response(json.dumps(r.json()), status=200, mimetype='application/json')
-        else:
-            return r.status_code(),401
-    except Exception:
-        return Response(json.dumps(r.json()), status=200, mimetype='application/json')
+    x = r.json()
+    allMovieData = json.loads(str(x["body"]).replace('\n', ''))
+    my_dict = {}
+    my_dict['Set-Cookie']= allMovieData
+    return Response(json.dumps(allMovieData), 
+        mimetype='application/json',
+        headers={'Content-Disposition':'attachment;filename=zones.json'})
+
+@app.get("/api/importnote")
+def importnote():
+    source = str(request.args.get('JSESSIONID'))
+    filess = request.files['file']
+    url = 'http://10.10.65.3:9995/api/notebook/import'
+    cookies = {"JSESSIONID": source}
+    text = filess.read()
+    r = requests.get(url, cookies=cookies,json=text)
+    x = r.json()
+    return x
 
 if __name__ == "__main__":
     app.run(debug=True)
