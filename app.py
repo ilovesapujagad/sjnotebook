@@ -181,16 +181,21 @@ def exportnote(noteid):
         mimetype='application/json',
         headers={'Content-Disposition':'attachment;filename=zones.json'})
 
-@app.post("/api/importnote")
-def importnote():
+@app.get("/api/export/<noteid>")
+def exportnote(noteid):
     source = str(request.args.get('JSESSIONID'))
-    filess = request.files['file']
-    url = 'http://10.10.65.3:9995/api/notebook/import'
+    snoteid = str(noteid)
+    url = 'http://10.10.65.3:9995/api/notebook/export/'+snoteid+''
     cookies = {"JSESSIONID": source}
-    text = filess.read()
-    r = requests.get(url, cookies=cookies,json=text)
+    r = requests.post(url, cookies=cookies)
     x = r.json()
-    return x
+    allMovieData = json.loads(str(x["body"]).replace('\n', ''))
+    my_dict = {}
+    my_dict['Set-Cookie']= allMovieData
+    return Response(json.dumps(allMovieData), 
+        mimetype='application/json',
+        headers={'Content-Disposition':'attachment;filename=zones.json'})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
