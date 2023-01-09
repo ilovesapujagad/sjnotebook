@@ -100,16 +100,15 @@ def deletenote(id):
 
 @app.post("/api/notebook/<noteid>/paragraph")
 def newparagraph(noteid):
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
     request_data = request.get_json()
-    title = request_data['title']
-    text = request_data['text']
+    data = json.loads(request.data)
     snoteid = str(noteid)
-    sudah = str(title)
-    sudah2 = str(text)
     source = str(request.args.get('JSESSIONID'))
     url = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph'
     cookies = {"JSESSIONID": source}
-    r = requests.post(url, cookies=cookies, json={"title": sudah,"text":sudah2 })
+    r = requests.post(url, cookies=cookies, json=data)
     return r.json()
 
 @app.post("/api/notebook/run/<noteid>/<paragraphid>")
