@@ -5,7 +5,7 @@ import paramiko
 from paramiko import SSHClient
 from sys import stderr
 from flask import Flask, request, jsonify,make_response,Response
-
+from websocket import create_connection
 app = Flask(__name__)
 
 api_key = os.environ.get("API_KEY", "")
@@ -122,16 +122,20 @@ def runparagraph(noteid,paragraphid):
     return r.json()
 
 @app.put("/api/notebook/<noteid>/rename")
-def renameparagraph(noteid):
-    request_data = request.get_json()
-    name = request_data['name']
-    sudah = str(name)
-    snoteid = str(noteid)
+def renamenote(noteid):
+    zzz = str(noteid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook'+snoteid+'/rename'
-    cookies = {"JSESSIONID": source}
-    r = requests.put(url, cookies=cookies, json={"name": sudah})
-    return r.json()
+    request_data = request.get_json()
+    sss = str(request_data['name'])
+    try:
+        ws = create_connection("ws://10.10.65.3:9995/ws")
+        ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": "admin", "ticket": "c4a89468-98e5-41dd-945c-6478692417c3", "roles": "[\"admin\"]" }))
+        result =  ws.recv()
+        print (result)
+        ws.close()
+        return jsonify({"msg": "Success rename notebook"}), 200
+    except:
+        return jsonify({"msg": "error rename notebook"}), 400
 
 @app.route("/api/notebook/<noteid>/paragraph/<paragraphid>", methods=["DELETE"])
 def deleteparagraph(noteid,paragraphid):
@@ -179,6 +183,9 @@ def exportnote(noteid):
     return Response(json.dumps(allMovieData), 
         mimetype='application/json',
         headers={'Content-Disposition':'attachment;filename=zones.json'})
+
+
+
 
 
 if __name__ == "__main__":
