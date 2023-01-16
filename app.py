@@ -164,16 +164,10 @@ def updateparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    urlconfig = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
     url = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
-    if stext[0,2] == "%md":
-      xx = requests.put(urlconfig , cookies=cookies, json = {"editorHide": True})
-      r = requests.put(url, cookies=cookies, json={"text": stext})
-      return r.json()
-    else:
-      r = requests.put(url, cookies=cookies, json={"text": stext})
-      return r.json()
+    r = requests.put(url, cookies=cookies, json={"text": stext})
+    return r.json()
 
 @app.get("/api/export/<noteid>")
 def exportnote(noteid):
