@@ -122,12 +122,13 @@ def runparagraph(noteid,paragraphid):
     r = requests.post(url, cookies=cookies)
     resinfo = requests.get(urlinfo, cookies=cookies)
     x = str(resinfo.json()['body']['text'])
-    if x[0,2] == "%md":
-      urls = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
-      z = requests.put(url, cookies=cookies, json = {"editorHide": True})
-      return z.json()
+    print(x[0:3])
+    if x[0:3] == "%md":
+        urls = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
+        z = requests.put(urls, cookies=cookies, json = {"editorHide": True})
+        return r.json()
     else:
-      return r.json()
+        return r.json()
 
 @app.put("/api/notebook/<noteid>/rename")
 def renamenote(noteid):
