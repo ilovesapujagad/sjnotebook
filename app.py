@@ -123,9 +123,9 @@ def runparagraph(noteid,paragraphid):
     resinfo = requests.get(urlinfo, cookies=cookies)
     x = str(resinfo.json()['body']['text'])
     if x[0,2] == "%md":
-      url = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
+      urls = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
       z = requests.put(url, cookies=cookies, json = {"editorHide": True})
-      return r.json()
+      return z.json()
     else:
       return r.json()
 
