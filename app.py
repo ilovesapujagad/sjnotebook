@@ -153,10 +153,11 @@ def renamenote(noteid):
     request_data = request.get_json()
     sss = str(request_data['name'])
     idd = str(request_data['idzeppelin'])
-    roles = str(getlogins(idd))+"\"
+    roles = str(getlogins(idd))
+    roless = f"[roles]"
     try:
         ws = create_connection("ws://10.10.65.3:9995/ws")
-        ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": "admin", "ticket": source, "roles": "[\"+roles+"]" }))
+        ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": "admin", "ticket": source, "roles": roless }))
         result =  ws.recv()
         print (result)
         ws.close()
