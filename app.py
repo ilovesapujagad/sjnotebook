@@ -132,8 +132,8 @@ def runparagraph(noteid,paragraphid):
     
 def logins():
     url = "https://database-query.v3.microgen.id/api/v1/fb6db565-2e6c-41eb-bf0f-66f43b2b75ae/auth/login"
-    email = "system@system.com"
-    password = "2wsx1qaz"
+    email = "admin@sapujagad.id"
+    password = "123123"
     form_data = {'email': email,'password': password}
     res = requests.post(url,json=form_data)
     return res.json()['token']
@@ -154,6 +154,7 @@ def renamenote(noteid):
     sss = str(request_data['name'])
     idd = str(request_data['idzeppelin'])
     roles = str(getlogins(idd))
+    roless = f"[roles]"
     try:
         ws = create_connection("ws://10.10.65.3:9995/ws")
         ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": "admin", "ticket": source, "roles": f"[\"{roles}\"]" }))
