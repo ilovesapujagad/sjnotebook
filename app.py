@@ -142,8 +142,15 @@ def getlogins(id):
     bearer_token = logins()
     url="https://database-query.v3.microgen.id/api/v1/fb6db565-2e6c-41eb-bf0f-66f43b2b75ae/ZeppelinUser/"+id+""
     res = requests.get(url,headers={"Authorization": "Bearer %s" %bearer_token})
-#     z = loginzeppelin(res.json()['username'],res.json()['password'])
+
     return res.json()
+
+def loginticket(username,password):
+    logins = {"userName":username,"password":password}
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    url = "http://10.10.65.3:9995/api/login"
+    x = requests.post(url, data=logins, headers=headers)
+    return x.json()["body"]["ticket"]
 
 
 @app.put("/api/notebook/<noteid>/rename")
@@ -154,16 +161,18 @@ def renamenote(noteid):
     sss = str(request_data['name'])
     idd = str(request_data['idzeppelin'])
     xx = getlogins(idd)
+    ticket= loginticket(str(xx['username']),str(xx['password']))
     roles = str(xx['role'])
     username = str(xx['username'])
     try:
         ws = create_connection("ws://10.10.65.3:9995/ws")
-        ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": username, "ticket": source, "roles": f"[\"{roles}\"]" }))
+        ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": username, "ticket": ticket, "roles": f"[\"{roles}\"]" }))
         result =  ws.recv()
         print (result)
         ws.close()
         return jsonify({"msg": "Success rename notebook"}), 200
     except:
+        return jsonify({"msg": "error rename notebook"}), 400
         return jsonify({"msg": "error rename notebook"}), 400
 
 @app.route("/api/notebook/<noteid>/paragraph/<paragraphid>", methods=["DELETE"])
