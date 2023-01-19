@@ -222,6 +222,16 @@ def exportnote(noteid):
         mimetype='application/json',
         headers={'Content-Disposition':'attachment;filename=zones.json'})
 
+@app.post("/api/notebook/<noteid>/<paragraphid>/move/<index>")
+def index(noteid,paragraphid,index):
+    snoteid = str(noteid)
+    sparagraphId = str(paragraphid)
+    sindex = str(index)
+    source = str(request.args.get('JSESSIONID'))
+    cookies = {"JSESSIONID": source}
+    urlindex = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/move/'+sindex+''
+    index = requests.post(urlindex,cookies=cookies)
+    return index.json()
 
 
 
