@@ -25,10 +25,9 @@ def login():
     port = 9995
     username = "sapujagad"
     password = "kayangan"
-    userz = request.form.get('username')
-    passz= request.form.get('password')
-    usernamez= userz
-    passwordz= passz
+    usernamez = str(request.form.get('username'))
+    passwordz= str(request.form.get('password'))
+
     
     command = "curl -i --data 'userName=%s&password=%s' -X POST http://10.10.65.3:9995/api/login" % (usernamez , passwordz)
     
