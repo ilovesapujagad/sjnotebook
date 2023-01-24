@@ -55,7 +55,7 @@ def login():
     return xs
 
 @app.get("/api/list")
-def cpu():
+def listnotebookbyuser():
     source = str(request.args.get('JSESSIONID'))
     url = 'http://10.10.65.3:9995/api/notebook'
     cookies = {"JSESSIONID": source}
@@ -69,7 +69,7 @@ def cpu():
         return r.json(),401
 
 @app.get("/api/notebook/<noteId>")
-def cpus(noteId):
+def infonotebook(noteId):
     sidnode = str(noteId)
     source = str(request.args.get('JSESSIONID'))
     url = 'http://10.10.65.3:9995/api/notebook/%s' % (sidnode)
