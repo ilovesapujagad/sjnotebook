@@ -25,9 +25,10 @@ def login():
     port = 9995
     username = "sapujagad"
     password = "kayangan"
-    usernamez = str(request.form.get('username'))
-    passwordz= str(request.form.get('password'))
-
+    # userz = request.form.get('username')
+    # passz= request.form.get('password')
+    # usernamez= userz
+    # passwordz= passz
     
     command = "curl -i --data 'userName=%s&password=%s' -X POST http://10.10.65.3:9995/api/login" % (usernamez , passwordz)
     
@@ -48,10 +49,11 @@ def login():
     s = x[g:u]
     my_dict = {}
     my_dict['Set-Cookie']= s
-    xs = make_response(my_dict)
-    xs.headers["Set-Cookie"] = s
+    # xs = make_response(my_dict)
+    # xs.headers["Set-Cookie"] = s
     client.close()
-    return xs
+    return jsonify(my_dict)
+
 
 @app.get("/api/list")
 def listnotebookbyuser():
