@@ -25,8 +25,8 @@ def login():
     port = 9995
     username = "sapujagad"
     password = "kayangan"
-    # userz = request.form.get('username')
-    # passz= request.form.get('password')
+    usernamez = str(request.form.get('username'))
+    passwordz = str(request.form.get('password'))
     # usernamez= userz
     # passwordz= passz
     
