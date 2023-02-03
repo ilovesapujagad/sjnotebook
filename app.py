@@ -49,10 +49,10 @@ def login():
         s = x[g:u]
         my_dict = {}
         my_dict['Set-Cookie']= s
-        # xs = make_response(my_dict)
-        # xs.headers["Set-Cookie"] = s
+        xs = make_response(my_dict)
+        xs.headers["Set-Cookie"] = s
         client.close()
-        return jsonify(my_dict)
+        return xs
     except Exception as e:
         print(e)
         return jsonify(e)
