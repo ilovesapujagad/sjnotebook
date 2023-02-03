@@ -30,13 +30,13 @@ def login():
         # usernamez= userz
         # passwordz= passz
         
-        command = "curl -i --data 'userName=%s&password=%s' -X POST http://10.10.65.3:9995/api/login" % (usernamez , passwordz)
+        command = "curl -i --data 'userName=%s&password=%s' -X POST https://10.10.65.3:9995/api/login" % (usernamez , passwordz)
         
         client = SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(hostname, username=username, password=password)
 
-    #     command = "curl -i --data 'userName=admin&password=admin' -X POST http://10.207.26.22:9995/api/login"
+    #     command = "curl -i --data 'userName=admin&password=admin' -X POST https://10.207.26.22:9995/api/login"
         stdin, stdout, stderr = client.exec_command(command)
         # for line in stdout.readlines():
         #     print (line)
@@ -61,7 +61,7 @@ def login():
 @app.get("/api/list")
 def listnotebookbyuser():
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook'
+    url = 'https://10.10.65.3:9995/api/notebook'
     cookies = {"JSESSIONID": source}
     r = requests.get(url, cookies=cookies)
     try:
@@ -76,7 +76,7 @@ def listnotebookbyuser():
 def infonotebook(noteId):
     sidnode = str(noteId)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/%s' % (sidnode)
+    url = 'https://10.10.65.3:9995/api/notebook/%s' % (sidnode)
     userz = request.form.get('username')
     cookies = {"JSESSIONID": source}
     r = requests.get(url, cookies=cookies)
@@ -88,7 +88,7 @@ def newnote():
     name = request_data['name']
     sudah = str(name)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook'
+    url = 'https://10.10.65.3:9995/api/notebook'
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies, json={"name": sudah})
     return r.json()
@@ -97,7 +97,7 @@ def newnote():
 def deletenote(id):
     sudah = str(id)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/%s' % (sudah)
+    url = 'https://10.10.65.3:9995/api/notebook/%s' % (sudah)
     cookies = {"JSESSIONID": source}
     r = requests.delete(url, cookies=cookies)
     return r.json()
@@ -110,7 +110,7 @@ def newparagraph(noteid):
     data = json.loads(request.data)
     snoteid = str(noteid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph'
+    url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph'
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies, json=data)
     return r.json()
@@ -120,15 +120,15 @@ def runparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/run/'+snoteid+'/'+sparagraphId+''
-    urlinfo = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    url = 'https://10.10.65.3:9995/api/notebook/run/'+snoteid+'/'+sparagraphId+''
+    urlinfo = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies)
     resinfo = requests.get(urlinfo, cookies=cookies)
     x = str(resinfo.json()['body']['text'])
     print(x[0:3])
     if x[0:3] == "%md":
-        urls = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
+        urls = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
         z = requests.put(urls, cookies=cookies, json = {"editorHide": True})
         return r.json()
     else:
@@ -152,7 +152,7 @@ def getlogins(id):
 def loginticket(username,password):
     logins = {"userName":username,"password":password}
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    url = "http://10.10.65.3:9995/api/login"
+    url = "https://10.10.65.3:9995/api/login"
     x = requests.post(url, data=logins, headers=headers)
     return x.json()["body"]["ticket"]
 
@@ -184,7 +184,7 @@ def deleteparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.delete(url, cookies=cookies)
     return r.json()
@@ -193,7 +193,7 @@ def deleteparagraph(noteid,paragraphid):
 def runallparagraph(noteid):
     snoteid = str(noteid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/job/'+snoteid+''
+    url = 'https://10.10.65.3:9995/api/notebook/job/'+snoteid+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies)
     return r.json()
@@ -206,7 +206,7 @@ def updateparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.put(url, cookies=cookies, json={"text": stext})
     return r.json()
@@ -215,7 +215,7 @@ def updateparagraph(noteid,paragraphid):
 def exportnote(noteid):
     source = str(request.args.get('JSESSIONID'))
     snoteid = str(noteid)
-    url = 'http://10.10.65.3:9995/api/notebook/export/'+snoteid+''
+    url = 'https://10.10.65.3:9995/api/notebook/export/'+snoteid+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies)
     x = r.json()
@@ -233,7 +233,7 @@ def index(noteid,paragraphid,index):
     sindex = str(index)
     source = str(request.args.get('JSESSIONID'))
     cookies = {"JSESSIONID": source}
-    urlindex = 'http://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/move/'+sindex+''
+    urlindex = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/move/'+sindex+''
     index = requests.post(urlindex,cookies=cookies)
     return index.json()
 
