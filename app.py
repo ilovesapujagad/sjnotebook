@@ -46,7 +46,7 @@ def listnotebookbyuser():
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook'
     cookies = {"JSESSIONID": source}
-    r = requests.get(url, cookies=cookies)
+    r = requests.get(url, cookies=cookies,verify=False)
     try:
         if r.status_code == 200:
             return r.json()
@@ -62,7 +62,7 @@ def infonotebook(noteId):
     url = 'https://10.10.65.3:9995/api/notebook/%s' % (sidnode)
     userz = request.form.get('username')
     cookies = {"JSESSIONID": source}
-    r = requests.get(url, cookies=cookies)
+    r = requests.get(url, cookies=cookies,verify=False)
     return r.json()
 
 @app.post("/api/createnote")
@@ -73,7 +73,7 @@ def newnote():
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook'
     cookies = {"JSESSIONID": source}
-    r = requests.post(url, cookies=cookies, json={"name": sudah})
+    r = requests.post(url, cookies=cookies, json={"name": sudah},verify=False)
     return r.json()
 
 @app.route("/api/notebook/<id>", methods=["DELETE"])
@@ -82,7 +82,7 @@ def deletenote(id):
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook/%s' % (sudah)
     cookies = {"JSESSIONID": source}
-    r = requests.delete(url, cookies=cookies)
+    r = requests.delete(url, cookies=cookies,verify=False)
     return r.json()
 
 @app.post("/api/notebook/<noteid>/paragraph")
@@ -95,7 +95,7 @@ def newparagraph(noteid):
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph'
     cookies = {"JSESSIONID": source}
-    r = requests.post(url, cookies=cookies, json=data)
+    r = requests.post(url, cookies=cookies, json=data,verify=False)
     return r.json()
 
 @app.post("/api/notebook/run/<noteid>/<paragraphid>")
@@ -107,12 +107,12 @@ def runparagraph(noteid,paragraphid):
     urlinfo = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies)
-    resinfo = requests.get(urlinfo, cookies=cookies)
+    resinfo = requests.get(urlinfo, cookies=cookies,verify=False)
     x = str(resinfo.json()['body']['text'])
     print(x[0:3])
     if x[0:3] == "%md":
         urls = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
-        z = requests.put(urls, cookies=cookies, json = {"editorHide": True})
+        z = requests.put(urls, cookies=cookies, json = {"editorHide": True},verify=False)
         return r.json()
     else:
         return r.json()
@@ -122,13 +122,13 @@ def logins():
     email = "admin@sapujagad.id"
     password = "123123"
     form_data = {'email': email,'password': password}
-    res = requests.post(url,json=form_data)
+    res = requests.post(url,json=form_data,verify=False)
     return res.json()['token']
 
 def getlogins(id):
     bearer_token = logins()
     url="https://database-query.v3.microgen.id/api/v1/fb6db565-2e6c-41eb-bf0f-66f43b2b75ae/ZeppelinUser/"+id+""
-    res = requests.get(url,headers={"Authorization": "Bearer %s" %bearer_token})
+    res = requests.get(url,headers={"Authorization": "Bearer %s" %bearer_token},verify=False)
 
     return res.json()
 
@@ -136,7 +136,7 @@ def loginticket(username,password):
     logins = {"userName":username,"password":password}
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     url = "https://10.10.65.3:9995/api/login"
-    x = requests.post(url, data=logins, headers=headers)
+    x = requests.post(url, data=logins, headers=headers,verify=False)
     return x.json()["body"]["ticket"]
 
 
@@ -152,7 +152,7 @@ def renamenote(noteid):
     roles = str(xx['role'])
     username = str(xx['username'])
     try:
-        ws = create_connection("ws://10.10.65.3:9995/ws")
+        ws = create_connection("wss://10.10.65.3:9995/wss")
         ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": username, "ticket": ticket, "roles": f"[\"{roles}\"]" }))
         result =  ws.recv()
         print (result)
@@ -169,7 +169,7 @@ def deleteparagraph(noteid,paragraphid):
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
-    r = requests.delete(url, cookies=cookies)
+    r = requests.delete(url, cookies=cookies,verify=False)
     return r.json()
 
 @app.post("/api/notebook/job/<noteid>")
@@ -178,7 +178,7 @@ def runallparagraph(noteid):
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook/job/'+snoteid+''
     cookies = {"JSESSIONID": source}
-    r = requests.post(url, cookies=cookies)
+    r = requests.post(url, cookies=cookies,verify=False)
     return r.json()
 
 @app.route("/api/notebook/<noteid>/paragraph/<paragraphid>", methods=["PUT"])
@@ -191,7 +191,7 @@ def updateparagraph(noteid,paragraphid):
     source = str(request.args.get('JSESSIONID'))
     url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
-    r = requests.put(url, cookies=cookies, json={"text": stext})
+    r = requests.put(url, cookies=cookies, json={"text": stext},verify=False)
     return r.json()
 
 @app.get("/api/export/<noteid>")
@@ -200,7 +200,7 @@ def exportnote(noteid):
     snoteid = str(noteid)
     url = 'https://10.10.65.3:9995/api/notebook/export/'+snoteid+''
     cookies = {"JSESSIONID": source}
-    r = requests.post(url, cookies=cookies)
+    r = requests.post(url, cookies=cookies,verify=False)
     x = r.json()
     allMovieData = json.loads(str(x["body"]).replace('\n', ''))
     my_dict = {}
@@ -217,7 +217,7 @@ def index(noteid,paragraphid,index):
     source = str(request.args.get('JSESSIONID'))
     cookies = {"JSESSIONID": source}
     urlindex = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/move/'+sindex+''
-    index = requests.post(urlindex,cookies=cookies)
+    index = requests.post(urlindex,cookies=cookies,verify=False)
     return index.json()
 
 
