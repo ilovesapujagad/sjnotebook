@@ -30,7 +30,7 @@ def login():
         # usernamez= userz
         # passwordz= passz
         
-        command = "curl -i --data 'userName=%s&password=%s' -X POST https://10.10.65.3:9995/api/login" % (usernamez , passwordz)
+        command = "curl -i --data 'userName=%s&password=%s' -X POST http://10.10.65.3:9995/api/login" % (usernamez , passwordz)
         
         client = SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
