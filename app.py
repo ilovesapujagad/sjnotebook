@@ -152,7 +152,7 @@ def renamenote(noteid):
     roles = str(xx['role'])
     username = str(xx['username'])
     try:
-        ws = create_connection("wss://10.10.65.3:9995/wss")
+        ws = create_connection("wss://10.10.65.3:9995/ws")
         ws.send(json.dumps({ "op": "NOTE_RENAME", "data": { "id": zzz, "name": sss }, "principal": username, "ticket": ticket, "roles": f"[\"{roles}\"]" }))
         result =  ws.recv()
         print (result)
