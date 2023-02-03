@@ -21,38 +21,21 @@ def hello_geek():
 @app.post("/api/login")
 def login():
     try:
-        hostname = '10.10.65.3'
-        port = 9995
-        username = "sapujagad"
-        password = "kayangan"
         usernamez = str(request.form.get('username'))
         passwordz = str(request.form.get('password'))
-        # usernamez= userz
-        # passwordz= passz
-        
-        command = "curl -i --data 'userName=%s&password=%s' -X POST http://10.10.65.3:9995/api/login" % (usernamez , passwordz)
-        
-        client = SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname, username=username, password=password)
-
-    #     command = "curl -i --data 'userName=admin&password=admin' -X POST https://10.207.26.22:9995/api/login"
-        stdin, stdout, stderr = client.exec_command(command)
-        # for line in stdout.readlines():
-        #     print (line)
-        z=stdout.read()
-        # print(z)
-        x = str(z)
-        nu = x.find('Content-Type: application/json')
-        g = int(nu)-162
-        u = int(g)+47
-        s = x[g:u]
-        my_dict = {}
-        my_dict['Set-Cookie']= s
-        xs = make_response(my_dict)
-        xs.headers["Set-Cookie"] = s
-        client.close()
-        return xs
+        userz = request.form.get('username')
+        passz= request.form.get('password')
+        session = requests.Session()
+        url = "https://10.10.65.3:9995/api/login"
+        form_data = {'username': str(userz),'password':str(passz)}
+        response = session.post(url,data=form_data,verify=False)
+        my_dict = session.cookies.get_dict()
+        x = list(my_dict.keys())
+        y = list(my_dict.values())
+        stringsession = str(x[0])+"="+str(y[0])
+        response_dict = {}
+        response_dict['Set-Cookie']= stringsession
+        return response_dict
     except Exception as e:
         print(e)
         return jsonify(e)
