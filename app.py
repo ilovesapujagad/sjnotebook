@@ -41,7 +41,7 @@ def login():
     except Exception as e:
         print(e)
         return jsonify(e)
-    
+@app.post("/login/ws")    
 def loginws():
     try:
         request_data = request.get_json()
