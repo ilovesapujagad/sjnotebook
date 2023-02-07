@@ -40,6 +40,20 @@ def login():
     except Exception as e:
         print(e)
         return jsonify(e)
+    
+@app.get("/login/ws")
+def loginws():
+    try:
+        request_data = request.get_json()
+        username = request_data['username']
+        passord = request_data['password']
+        url = f"{zep_url}api/login"
+        form_data = {'username': str(username),'password':str(passord)}
+        response = request.post(url,data=form_data)
+        return response.json()
+    except Exception as e:
+        print(e)
+        return jsonify(e)
 
 
 @app.get("/api/list")
