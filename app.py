@@ -28,7 +28,7 @@ def login():
         userz = request.form.get('username')
         passz= request.form.get('password')
         session = requests.Session()
-        url = f"{zep_url}api/login"
+        url = f"{zep_url}/api/login"
         form_data = {'username': str(userz),'password':str(passz)}
         response = session.post(url,data=form_data,verify=False)
         my_dict = session.cookies.get_dict()
@@ -48,7 +48,7 @@ def loginws():
         request_data = request.get_json()
         username = request_data['username']
         passord = request_data['password']
-        url = f"{zep_url}api/login"
+        url = f"{zep_url}/api/login"
         form_data = {'username': str(username),'password':str(passord)}
         response = request.post(url,data=form_data)
         return response.json()
@@ -60,7 +60,7 @@ def loginws():
 @app.get("/api/list")
 def listnotebookbyuser():
     source = str(request.args.get('JSESSIONID'))
-    url = f"{zep_url}api/notebook"
+    url = f"{zep_url}/api/notebook"
     cookies = {"JSESSIONID": source}
     r = requests.get(url, cookies=cookies,verify=False)
     try:
