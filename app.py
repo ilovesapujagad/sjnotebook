@@ -41,7 +41,7 @@ def login():
         print(e)
         return jsonify(e)
     
-@app.get("/login/ws")
+@app.post("/login/ws")
 def loginws():
     try:
         request_data = request.get_json()
