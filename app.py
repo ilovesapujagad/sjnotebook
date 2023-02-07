@@ -105,7 +105,7 @@ def runparagraph(noteid,paragraphid):
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
     url = zep_url+'/api/notebook/run/'+snoteid+'/'+sparagraphId+''
-    urlinfo = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    urlinfo = zep_url+'/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies)
     resinfo = requests.get(urlinfo, cookies=cookies,verify=False)
