@@ -9,8 +9,8 @@ from websocket import create_connection
 app = Flask(__name__)
 
 api_key = os.environ.get("API_KEY", "")
-# zep_url = os.environ.get("ZEP_URL", "")
-zep_url = "http://10.10.65.3:9995"
+zep_url = os.environ.get("ZEP_URL", "")
+# zep_url = "http://10.10.65.3:9995"
 if api_key == "":
     print("api key is required", file=stderr)
 
@@ -42,16 +42,23 @@ def login():
         print(e)
         return jsonify(e)
     
-@app.post("/login/ws")
 def loginws():
     try:
         request_data = request.get_json()
         username = request_data['username']
         passord = request_data['password']
         url = f"{zep_url}/api/login"
+        session = requests.Session()
         form_data = {'userName': str(username),'password':str(passord)}
         response = requests.post(url,data=form_data)
-        return response.json()
+        responses = session.post(url,data=form_data,verify=False)
+        my_dict = session.cookies.get_dict()
+        x = list(my_dict.keys())
+        y = list(my_dict.values())
+        stringsession = str(x[0])+"="+str(y[0])
+        response_dict = response.json()
+        response_dict['Set-Cookie']= stringsession
+        return jsonify(response_dict)
     except Exception as e:
         print(e)
         return jsonify(e)
