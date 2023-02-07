@@ -9,6 +9,7 @@ from websocket import create_connection
 app = Flask(__name__)
 
 api_key = os.environ.get("API_KEY", "")
+zep_url = os.environ.get("ZEP_URL", "")
 if api_key == "":
     print("api key is required", file=stderr)
 
@@ -26,7 +27,7 @@ def login():
         userz = request.form.get('username')
         passz= request.form.get('password')
         session = requests.Session()
-        url = "https://10.10.65.3:9995/api/login"
+        url = f"{zep_url}api/login"
         form_data = {'username': str(userz),'password':str(passz)}
         response = session.post(url,data=form_data,verify=False)
         my_dict = session.cookies.get_dict()
@@ -44,7 +45,7 @@ def login():
 @app.get("/api/list")
 def listnotebookbyuser():
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook'
+    url = f"{zep_url}api/notebook"
     cookies = {"JSESSIONID": source}
     r = requests.get(url, cookies=cookies,verify=False)
     try:
@@ -59,7 +60,7 @@ def listnotebookbyuser():
 def infonotebook(noteId):
     sidnode = str(noteId)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/%s' % (sidnode)
+    url = '%s/api/notebook/%s' % (zep_url,sidnode)
     userz = request.form.get('username')
     cookies = {"JSESSIONID": source}
     r = requests.get(url, cookies=cookies,verify=False)
@@ -71,7 +72,7 @@ def newnote():
     name = request_data['name']
     sudah = str(name)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook'
+    url = '%s/api/notebook' % (zep_url)
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies, json={"name": sudah},verify=False)
     return r.json()
@@ -80,7 +81,7 @@ def newnote():
 def deletenote(id):
     sudah = str(id)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/%s' % (sudah)
+    url = '%s/api/notebook/%s' % (zep_url,sudah)
     cookies = {"JSESSIONID": source}
     r = requests.delete(url, cookies=cookies,verify=False)
     return r.json()
@@ -93,7 +94,7 @@ def newparagraph(noteid):
     data = json.loads(request.data)
     snoteid = str(noteid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph'
+    url = zep_url+'/api/notebook/'+snoteid+'/paragraph'
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies, json=data,verify=False)
     return r.json()
@@ -103,7 +104,7 @@ def runparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/run/'+snoteid+'/'+sparagraphId+''
+    url = zep_url+'/api/notebook/run/'+snoteid+'/'+sparagraphId+''
     urlinfo = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies)
@@ -111,7 +112,7 @@ def runparagraph(noteid,paragraphid):
     x = str(resinfo.json()['body']['text'])
     print(x[0:3])
     if x[0:3] == "%md":
-        urls = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
+        urls = zep_url+'/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/config'
         z = requests.put(urls, cookies=cookies, json = {"editorHide": True},verify=False)
         return r.json()
     else:
@@ -135,7 +136,7 @@ def getlogins(id):
 def loginticket(username,password):
     logins = {"userName":username,"password":password}
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    url = "https://10.10.65.3:9995/api/login"
+    url = zep_url+'/api/login'
     x = requests.post(url, data=logins, headers=headers,verify=False)
     return x.json()["body"]["ticket"]
 
@@ -167,7 +168,7 @@ def deleteparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    url = zep_url+'/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.delete(url, cookies=cookies,verify=False)
     return r.json()
@@ -176,7 +177,7 @@ def deleteparagraph(noteid,paragraphid):
 def runallparagraph(noteid):
     snoteid = str(noteid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/job/'+snoteid+''
+    url = zep_url+'/api/notebook/job/'+snoteid+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies,verify=False)
     return r.json()
@@ -189,7 +190,7 @@ def updateparagraph(noteid,paragraphid):
     snoteid = str(noteid)
     sparagraphId = str(paragraphid)
     source = str(request.args.get('JSESSIONID'))
-    url = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
+    url = zep_url+'/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
     r = requests.put(url, cookies=cookies, json={"text": stext},verify=False)
     return r.json()
@@ -198,7 +199,7 @@ def updateparagraph(noteid,paragraphid):
 def exportnote(noteid):
     source = str(request.args.get('JSESSIONID'))
     snoteid = str(noteid)
-    url = 'https://10.10.65.3:9995/api/notebook/export/'+snoteid+''
+    url = zep_url+'/api/notebook/export/'+snoteid+''
     cookies = {"JSESSIONID": source}
     r = requests.post(url, cookies=cookies,verify=False)
     x = r.json()
@@ -216,7 +217,7 @@ def index(noteid,paragraphid,index):
     sindex = str(index)
     source = str(request.args.get('JSESSIONID'))
     cookies = {"JSESSIONID": source}
-    urlindex = 'https://10.10.65.3:9995/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/move/'+sindex+''
+    urlindex = zep_url+'/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+'/move/'+sindex+''
     index = requests.post(urlindex,cookies=cookies,verify=False)
     return index.json()
 
