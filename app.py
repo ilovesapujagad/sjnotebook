@@ -49,8 +49,8 @@ def loginws():
         username = request_data['username']
         passord = request_data['password']
         url = f"{zep_url}/api/login"
-        form_data = {'username': str(username),'password':str(passord)}
-        response = request.post(url,data=form_data)
+        form_data = {'userName': str(username),'password':str(passord)}
+        response = requests.post(url,data=form_data)
         return response.json()
     except Exception as e:
         print(e)
