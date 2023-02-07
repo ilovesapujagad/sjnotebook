@@ -9,7 +9,8 @@ from websocket import create_connection
 app = Flask(__name__)
 
 api_key = os.environ.get("API_KEY", "")
-zep_url = os.environ.get("ZEP_URL", "")
+# zep_url = os.environ.get("ZEP_URL", "")
+zep_url = "http://10.10.65.3:9995"
 if api_key == "":
     print("api key is required", file=stderr)
 
