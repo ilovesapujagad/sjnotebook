@@ -129,7 +129,7 @@ def runparagraph(noteid,paragraphid):
     url = zep_url+'/api/notebook/run/'+snoteid+'/'+sparagraphId+''
     urlinfo = zep_url+'/api/notebook/'+snoteid+'/paragraph/'+sparagraphId+''
     cookies = {"JSESSIONID": source}
-    r = requests.post(url, cookies=cookies)
+    r = requests.post(url, cookies=cookies,verify=False)
     resinfo = requests.get(urlinfo, cookies=cookies,verify=False)
     x = str(resinfo.json()['body']['text'])
     print(x[0:3])
